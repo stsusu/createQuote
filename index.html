@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f6f7fb">
-<title>맞춤 쿠키커터 견적</title>
+<title>주문제작 쿠키커터 견적</title>
 <style>
 :root{--ink:#20232b;--muted:#747987;--line:#e5e7ed;--paper:#fff;--bg:#f5f6f9;--accent:#e84b80;--accent-soft:#fff0f5;--blue:#5565d9}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;line-height:1.5}
@@ -16,11 +16,11 @@
 </head>
 <body>
 <main class="wrap">
-  <header class="top"><div><h1>맞춤 쿠키커터 견적</h1><p>이미지에서 제작 범위를 선택하고 치수를 입력해 견적 이미지를 만드세요.</p></div><span class="pill">AI 없이 기기에서 처리</span></header>
+  <header class="top"><div><h1>주문제작 쿠키커터 견적</h1><p>이미지에서 제작 범위를 선택하고 치수를 입력해 견적 이미지를 만드세요.</p></div><span class="pill">AI 없이 기기에서 처리</span></header>
   <section class="panel">
     <h2 class="section-title">견적 정보</h2>
     <div class="dimensions">
-      <div class="field"><label for="quoteTitle">견적서 제목</label><div class="input-suffix"><input id="quoteTitle" value="맞춤 쿠키커터 견적서" maxlength="40"></div></div>
+      <div class="field"><label for="quoteTitle">견적서 제목</label><div class="input-suffix"><input id="quoteTitle" value="주문제작 쿠키커터 견적서" maxlength="40"></div></div>
       <div class="field"><label for="quoteDate">날짜</label><div class="input-suffix"><input id="quoteDate" type="date"></div></div>
     </div>
     <p class="help">가격 공식: (가로 올림 + 세로 올림 − 1) × 1,000원</p>
@@ -46,7 +46,7 @@
   fileInput.addEventListener('change', e=>{[...e.target.files].forEach(addFile);fileInput.value='';});
   $('#clearBtn').addEventListener('click',()=>{items.splice(0).forEach(x=>URL.revokeObjectURL(x.url));designsEl.innerHTML='';updateTotal();$('#result').classList.add('hidden');});
   $('#makeBtn').addEventListener('click',makeQuote);
-  $('#downloadBtn').addEventListener('click',()=>{const a=document.createElement('a');a.href=$('#resultImg').src;a.download='맞춤쿠키커터_견적.png';a.click();});
+  $('#downloadBtn').addEventListener('click',()=>{const a=document.createElement('a');a.href=$('#resultImg').src;a.download='주문제작쿠키커터_견적서.png';a.click();});
   $('#quoteTitle').addEventListener('input',()=>{if(!$('#result').classList.contains('hidden'))makeQuote();});
   $('#quoteDate').addEventListener('change',()=>{if(!$('#result').classList.contains('hidden'))makeQuote();});
 
@@ -87,20 +87,19 @@
     ctx.fillStyle='#777b86';ctx.font='20px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';ctx.fillText($('#quoteDate').value||'',pad,115);
     ctx.strokeStyle='#e4e5ea';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad,145);ctx.lineTo(W-pad,145);ctx.stroke();
     for(let i=0;i<items.length;i++){const it=items[i],col=i%2,row=Math.floor(i/2),x=pad+col*(cardW+gap),y=headerH+row*(cardH+gap),d=dims(it),p=cost(it);roundRect(ctx,x,y,cardW,cardH,18,'#fff','#e7e8ed');
-      const title=(it.name||`디자인 ${i+1}`).slice(0,23);ctx.fillStyle='#333642';ctx.font='700 20px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';ctx.textAlign='left';ctx.fillText(title,x+20,y+34);
+      const title=`디자인 ${String(i+1).padStart(2,'0')}`;ctx.fillStyle='#333642';ctx.font='700 20px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';ctx.textAlign='left';ctx.fillText(title,x+20,y+34);
       const bx=x+20,by=y+54,bw=cardW-40,bh=270;ctx.fillStyle='#fafafd';roundRect(ctx,bx,by,bw,bh,12,'#fafafd','#f0f0f3');
       const cropImage=makeCropCanvas(it),areaX=bx+12,areaY=by+10,areaW=bw-78,areaH=bh-70,fit=Math.min(areaW/cropImage.width,areaH/cropImage.height),dw=cropImage.width*fit,dh=cropImage.height*fit,ix=areaX+(areaW-dw)/2,iy=areaY+(areaH-dh)/2;ctx.drawImage(cropImage,ix,iy,dw,dh);drawMeasurements(ctx,{x1:ix,y1:iy,x2:ix+dw,y2:iy+dh,box:{x:bx,y:by,w:bw,h:bh},w:d.w,h:d.h});
       ctx.fillStyle='#686c77';ctx.font='18px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';ctx.fillText(`${fmt(d.w)} × ${fmt(d.h)}cm`,x+20,y+356);
       ctx.fillStyle='#e84b80';ctx.font='700 25px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';ctx.textAlign='right';ctx.fillText(won(p),x+cardW-20,y+358);
     }
     const total=items.reduce((s,it)=>s+cost(it),0),fy=headerH+rows*cardH+(rows-1)*gap+28;roundRect(ctx,pad,fy,W-pad*2,112,18,'#fff0f5','#f7d5e0');ctx.fillStyle='#6a3548';ctx.textAlign='left';ctx.font='600 22px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';ctx.fillText(`총 ${items.length}개 디자인`,pad+26,fy+43);ctx.fillStyle='#df3d73';ctx.textAlign='right';ctx.font='800 39px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';ctx.fillText(`총 견적 ${won(total)}`,W-pad-26,fy+73);
-    ctx.fillStyle='#898c95';ctx.textAlign='center';ctx.font='15px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';ctx.fillText('가격 기준: (가로 올림 + 세로 올림 − 1) × 1,000원',W/2,fy+144);
     const blob=await new Promise(resolve=>cn.toBlob(resolve,'image/png'));if(!blob)return;$('#resultImg').src=URL.createObjectURL(blob);$('#result').classList.remove('hidden');$('#result').scrollIntoView({behavior:'smooth',block:'nearest'});
   }
   function drawMeasurements(ctx,m){const {x1,y1,x2,y2,box,w,h}=m;ctx.save();ctx.strokeStyle='#747987';ctx.fillStyle='#555a65';ctx.lineWidth=1.5;ctx.font='600 15px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';
     let left=Math.max(box.x+10,x1),right=Math.min(box.x+box.w-70,x2);if(right-left<58){const center=(x1+x2)/2;left=clamp(center-40,box.x+10,box.x+box.w-88);right=left+58;}
     const hy=box.y+box.h-34;ctx.beginPath();ctx.moveTo(left,hy);ctx.lineTo(right,hy);ctx.moveTo(left,hy-6);ctx.lineTo(left,hy+6);ctx.moveTo(right,hy-6);ctx.lineTo(right,hy+6);ctx.stroke();ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(`가로 ${fmt(w)}cm`,(left+right)/2,hy+7);
-    const vx=box.x+box.w-25,top=Math.max(box.y+8,y1),bottom=Math.min(box.y+box.h-62,y2);ctx.beginPath();ctx.moveTo(vx,top);ctx.lineTo(vx,bottom);ctx.moveTo(vx-6,top);ctx.lineTo(vx+6,top);ctx.moveTo(vx-6,bottom);ctx.lineTo(vx+6,bottom);ctx.stroke();ctx.translate(vx+10,(top+bottom)/2);ctx.rotate(-Math.PI/2);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(`세로 ${fmt(h)}cm`,0,0);ctx.restore();}
+    const vx=Math.min(box.x+box.w-28,x2+14),top=Math.max(box.y+8,y1),bottom=Math.min(box.y+box.h-62,y2);ctx.beginPath();ctx.moveTo(vx,top);ctx.lineTo(vx,bottom);ctx.moveTo(vx-6,top);ctx.lineTo(vx+6,top);ctx.moveTo(vx-6,bottom);ctx.lineTo(vx+6,bottom);ctx.stroke();ctx.translate(vx+8,(top+bottom)/2);ctx.rotate(-Math.PI/2);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(`세로 ${fmt(h)}cm`,0,0);ctx.restore();}
   function roundRect(ctx,x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}}
   function fmt(n){return (Math.round(n*10)/10).toFixed(1).replace(/\.0$/,'');}
   function won(n){return `${Math.round(n).toLocaleString('ko-KR')}원`;}
