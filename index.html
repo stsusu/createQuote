@@ -36,7 +36,7 @@
   <div id="designs" class="designs" aria-live="polite"></div>
   <section class="panel" id="summaryPanel">
     <div class="total"><div><div class="total-label">총 견적 금액</div><div class="formula" id="countLabel">디자인 0개</div></div><div class="total-value" id="totalValue">0원</div></div>
-    <div class="actions"><button class="btn btn-accent" id="makeBtn" type="button" disabled>견적 이미지 만들기</button><button class="btn btn-soft" id="clearBtn" type="button">전체 초기화</button></div>
+    <div class="actions"><button class="btn btn-accent" id="makeBtn" type="button" disabled>견적 이미지 만들기</button><button class="btn btn-soft" id="resetQuoteBtn" type="button">견적 이미지 초기화</button><button class="btn btn-soft" id="clearBtn" type="button">전체 초기화</button></div>
     <div id="result" class="result hidden"><img id="resultImg" alt="생성된 견적 이미지"><p>이미지를 길게 눌러 저장하거나 아래 버튼으로 다운로드하세요.</p><button class="btn btn-primary" id="downloadBtn" type="button">PNG 다운로드</button></div>
   </section>
 </main>
@@ -44,7 +44,7 @@
 (() => {
   const $ = s => document.querySelector(s), designsEl=$('#designs'), fileInput=$('#fileInput');
   const marginInput=$('#marginInput');
-  const items=[]; let nextId=1;
+  const items=[]; let nextId=1,quoteUrl=null;
   const date=$('#quoteDate'); date.value=new Date().toLocaleDateString('en-CA');
   $('#addBtn').addEventListener('click',()=>fileInput.click());
   fileInput.addEventListener('change', e=>{[...e.target.files].forEach(addFile);fileInput.value='';});
@@ -57,7 +57,9 @@
   window.addEventListener('drop',e=>{if(!hasFiles(e))return;e.preventDefault();clearDropHighlight();Array.from(e.dataTransfer.files||[]).forEach(addFile);});
   window.addEventListener('dragend',clearDropHighlight);
   window.addEventListener('blur',clearDropHighlight);
-  $('#clearBtn').addEventListener('click',()=>{items.splice(0).forEach(x=>URL.revokeObjectURL(x.url));designsEl.innerHTML='';updateTotal();$('#result').classList.add('hidden');});
+  $('#clearBtn').addEventListener('click',()=>{items.splice(0).forEach(x=>URL.revokeObjectURL(x.url));designsEl.innerHTML='';resetQuoteImage();updateTotal();});
+  $('#resetQuoteBtn').addEventListener('click',resetQuoteImage);
+  function resetQuoteImage(){if(quoteUrl){URL.revokeObjectURL(quoteUrl);quoteUrl=null;}$('#resultImg').removeAttribute('src');$('#result').classList.add('hidden');}
   $('#makeBtn').addEventListener('click',makeQuote);
   $('#downloadBtn').addEventListener('click',()=>{const a=document.createElement('a');a.href=$('#resultImg').src;a.download='주문제작쿠키커터_견적서.png';a.click();});
   $('#quoteTitle').addEventListener('input',()=>{if(!$('#result').classList.contains('hidden'))makeQuote();});
@@ -116,7 +118,7 @@
       ctx.fillStyle='#e84b80';ctx.font='700 25px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';ctx.textAlign='right';ctx.fillText(won(p),x+cardW-20,y+358);
     }
     const total=items.reduce((s,it)=>s+cost(it),0),fy=headerH+rows*cardH+(rows-1)*gap+28;roundRect(ctx,pad,fy,W-pad*2,112,18,'#fff0f5','#f7d5e0');ctx.fillStyle='#6a3548';ctx.textAlign='left';ctx.font='600 22px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';ctx.fillText(`총 ${items.length}개 디자인`,pad+26,fy+43);ctx.fillStyle='#df3d73';ctx.textAlign='right';ctx.font='800 39px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';ctx.fillText(`총 견적 ${won(total)}`,W-pad-26,fy+73);ctx.fillStyle='#898c95';ctx.textAlign='center';ctx.font='15px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';ctx.fillText(`표시 치수는 외곽 여백 ${marginMm()}mm씩 포함한 완성 크기입니다.`,W/2,fy+145);
-    const blob=await new Promise(resolve=>cn.toBlob(resolve,'image/png'));if(!blob)return;$('#resultImg').src=URL.createObjectURL(blob);$('#result').classList.remove('hidden');$('#result').scrollIntoView({behavior:'smooth',block:'nearest'});
+    const blob=await new Promise(resolve=>cn.toBlob(resolve,'image/png'));if(!blob)return;if(quoteUrl)URL.revokeObjectURL(quoteUrl);quoteUrl=URL.createObjectURL(blob);$('#resultImg').src=quoteUrl;$('#result').classList.remove('hidden');$('#result').scrollIntoView({behavior:'smooth',block:'nearest'});
   }
   function drawMeasurements(ctx,m){const {x1,y1,x2,y2,box,w,h}=m;ctx.save();ctx.strokeStyle='#747987';ctx.fillStyle='#555a65';ctx.lineWidth=1.5;ctx.font='600 15px -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif';
     let left=Math.max(box.x+10,x1),right=Math.min(box.x+box.w-70,x2);if(right-left<58){const center=(x1+x2)/2;left=clamp(center-40,box.x+10,box.x+box.w-88);right=left+58;}
